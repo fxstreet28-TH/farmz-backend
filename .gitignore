@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+node_modules
+# Supabase local artifacts
+supabase/.branches
+supabase/.temp
+supabase/.env
+supabase/functions/.env
+supabase/seed.local.sql
+.DS_Store

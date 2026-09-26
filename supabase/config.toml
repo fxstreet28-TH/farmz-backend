@@ -1,0 +1,42 @@
+# Supabase CLI config. Link to the dedicated FarmZ project with: supabase link --project-ref <ref>
+project_id = "farmz"
+
+[db]
+major_version = 17
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+
+# Auth endpoints do their own verification (SIWE); everything else requires a Supabase session JWT
+# at the gateway AND re-validates it in-function (requirePlayer).
+[functions.auth-nonce]
+verify_jwt = false
+[functions.auth-verify]
+verify_jwt = false
+[functions.config]
+verify_jwt = false
+# Internal: protected by x-internal-secret (INTERNAL_API_SECRET), not by user JWTs.
+[functions.mission-progress]
+verify_jwt = false
+
+[functions.state]
+verify_jwt = true
+[functions.plant]
+verify_jwt = true
+[functions.harvest]
+verify_jwt = true
+[functions.feed-animal]
+verify_jwt = true
+[functions.collect-produce]
+verify_jwt = true
+[functions.sell]
+verify_jwt = true
+[functions.buy]
+verify_jwt = true
+[functions.complete-order]
+verify_jwt = true
+[functions.claim-request]
+verify_jwt = true
+[functions.claim-confirm]
+verify_jwt = true

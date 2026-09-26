@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "test": "deno test --allow-env --allow-read tests/",
+    "test:sql": "bash scripts/test-sql.sh",
+    "check": "deno check supabase/functions/*/index.ts scripts/*.ts tests/*.ts",
+    "gen-signer": "deno run scripts/gen-signer.ts",
+    "verify-claim": "deno run --allow-net --allow-env --allow-read scripts/verify-claim-onchain.ts"
+  },
+  "fmt": { "lineWidth": 120 },
+  "exclude": ["node_modules"]
+}
