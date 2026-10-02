@@ -1,0 +1,34 @@
+name: Mirror to GitLab & Bitbucket
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mirror push
+        env:
+          GITLAB_URL: ${{ secrets.GITLAB_MIRROR_URL }}
+          BITBUCKET_SSH_KEY: ${{ secrets.BITBUCKET_SSH_KEY }}
+          BITBUCKET_SSH_REMOTE: git@bitbucket.org:aurumworkspace/farmz-backend.git
+          SRC: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        run: |
+          set +e
+          git clone --mirror "$SRC" repo.git
+          cd repo.git
+          fail=0
+          if [ -n "$GITLAB_URL" ]; then
+            echo "=== pushing to GitLab ==="
+            if git push --mirror "$GITLAB_URL"; then echo "GitLab: OK"; else echo "GitLab: FAILED"; fail=1; fi
+          else echo "GitLab: skipped (no GITLAB_MIRROR_URL)"; fi
+          if [ -n "$BITBUCKET_SSH_KEY" ]; then
+            echo "=== pushing to Bitbucket (SSH) ==="
+            mkdir -p ~/.ssh
+            printf '%s\n' "$BITBUCKET_SSH_KEY" > ~/.ssh/id_bb
+            chmod 600 ~/.ssh/id_bb
+            ssh-keyscan -t ed25519,rsa bitbucket.org >> ~/.ssh/known_hosts 2>/dev/null
+            export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/id_bb -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+            if git push --mirror "$BITBUCKET_SSH_REMOTE"; then echo "Bitbucket: OK"; else echo "Bitbucket: FAILED"; fail=1; fi
+          else echo "Bitbucket: skipped (no BITBUCKET_SSH_KEY)"; fi
+          echo "=== done (fail=$fail) ==="
+          exit $fail
